@@ -54,7 +54,6 @@ public interface CallFrequencyCounter<K> {
 
     /**
      * Removes element and associated counter
-     * 
      * @param key to remove
      */
     void removeElement(K key);

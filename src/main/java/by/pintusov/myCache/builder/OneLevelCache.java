@@ -1,24 +1,23 @@
 package by.pintusov.myCache.builder;
 
-import by.pintusov.myCache.api.Cache;
+import by.pintusov.myCache.api.ICache;
 
 /**
- * Cache with only one level of caching
+ * ICache with only one level of caching
  * @author pintusov
  */
-public class OneLevelCache<K, V> implements LeveledCache<K, V> {
-    private final Cache<K, V> cache;
+public class OneLevelCache<K, V> implements ILeveledCache<K, V> {
+    private final ICache<K, V> ICache;
 
-    public OneLevelCache(Cache<K, V> cache) {
-        this.cache = cache;
+    public OneLevelCache(ICache<K, V> ICache) {
+        this.ICache = ICache;
     }
 
-    public Cache<K, V> asCache() {
-        return cache;
+    public ICache<K, V> allCache() {
+        return ICache;
     }
 
     public void recache() {
         //no needs to implement
-        throw new UnsupportedOperationException();
     }
 }

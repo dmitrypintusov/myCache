@@ -1,41 +1,41 @@
 package by.pintusov.myCache.caching.memory;
 
+import by.pintusov.myCache.api.ICache;
+import by.pintusov.myCache.api.ObjectNotFoundException;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import cache.api.Cache;
-import cache.api.DoesNotExistException;
+public class MemoryCache<K, V> implements ICache<K, V> {
+    private final Map<K, V> memoryMap = new HashMap<K, V>();
 
-public class MemoryCache<K, V> implements Cache<K, V> {
-
-    private final Map<K, V> map = new HashMap<K, V>();
-
-    @Override
-    public void cache(K key, V value) {
-        map.put(key, value);
+    public void put(K key, V value) {
+        memoryMap.put(key, value);
     }
 
-    @Override
-    public V retrieve(K key) throws DoesNotExistException {
-        if (!map.containsKey(key)) {
-            throw new DoesNotExistException();
+    public V extract(K key) throws ObjectNotFoundException {
+        if (!memoryMap.containsKey(key)){
+            throw new ObjectNotFoundException();
         }
-
-        return map.get(key);
+        return memoryMap.get(key);
     }
 
-    @Override
     public void clear() {
-        map.clear();
+        memoryMap.clear();
     }
 
-    @Override
     public void remove(K key) {
-        map.remove(key);
+        memoryMap.remove(key);
+    }
+
+    public int size() {
+        return memoryMap.size();
     }
 
     @Override
-    public int size() {
-        return map.size();
+    public String toString() {
+        return "MemoryCache{" +
+                "memoryMap=" + memoryMap +
+                '}';
     }
 }

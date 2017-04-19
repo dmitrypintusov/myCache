@@ -4,15 +4,13 @@ import java.io.*;
 import java.util.Map.Entry;
 
 /**
- * Marchaller/Unmarchaller for standart serialization
- * 
- * @author agrigor
+ * Marchaller/Unmarchaller for standard serialization
+ * @author pintusov
  */
 public class StandartMarshallerUnmarshaller<K extends Serializable, V extends Serializable> implements
         MarshallerUnmarshaller<K, V> {
 
-    @Override
-    public void marshal(K key, V value, File file) {
+    public void convertIntoXml(K key, V value, File file) {
         OutputStream os = null;
         ObjectOutputStream oos = null;
         try {
@@ -25,48 +23,40 @@ public class StandartMarshallerUnmarshaller<K extends Serializable, V extends Se
         } catch (IOException e) {
             throw new RuntimeException("IO exception during unmarchalling", e);
         } finally {
-            closeQuietly(oos);
-            closeQuietly(os);
+            close(oos);
+            close(os);
         }
-
     }
 
-    private static void closeQuietly(Closeable closeable) {
+    private static void close(Closeable closeable) {
         try {
             if (closeable != null) {
                 closeable.close();
             }
         } catch (IOException e) {
+           e.printStackTrace();
         }
     }
 
-    @Override
-    public Entry<K, V> unmarshall(File file) {
+    public Entry<K, V> convertFromXml(File file) {
         Entry<K, V> result = null;
         InputStream is = null;
         ObjectInputStream ois = null;
 
         try {
-
             is = new BufferedInputStream(new FileInputStream(file));
             ois = new ObjectInputStream(is);
 
-            /*
-             * Supposing the type will be always the same
-             */
-            @SuppressWarnings("unchecked")
             K key = (K) ois.readObject();
-            @SuppressWarnings("unchecked")
             V value = (V) ois.readObject();
-
             result = new SerializableEntry<K, V>(key, value);
         } catch (IOException e) {
             throw new RuntimeException("IO exception during unmarchalling", e);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Class not found during unmarchalling", e);
         } finally {
-            closeQuietly(ois);
-            closeQuietly(is);
+            close(ois);
+            close(is);
         }
 
         return result;
@@ -75,8 +65,7 @@ public class StandartMarshallerUnmarshaller<K extends Serializable, V extends Se
     /**
      * 
      * Inner class to hold entries (pair key-value)
-     * 
-     * @author agrigor
+     * @author pintusov
      */
     private static class SerializableEntry<K, V> implements Entry<K, V> {
         private final K key;
@@ -87,20 +76,21 @@ public class StandartMarshallerUnmarshaller<K extends Serializable, V extends Se
             this.value = value;
         }
 
-        @Override
         public K getKey() {
             return key;
         }
 
-        @Override
         public V getValue() {
             return value;
         }
 
-        @Override
         public V setValue(V value) {
-            throw new RuntimeException("Operaion is not supported");
+            throw new RuntimeException("Operation is not supported");
         }
     }
 
+    @Override
+    public String toString() {
+        return "StandartMarshallerUnmarshaller{}";
+    }
 }

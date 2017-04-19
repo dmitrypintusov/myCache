@@ -6,13 +6,12 @@ import java.util.Map;
 
 /**
  * Strategy for encoding-decoding serializable classes
- * 
- * @author agrigor
+ * @author pintusov
  */
 public interface MarshallerUnmarshaller<K extends Serializable, V extends Serializable> {
 
-    Map.Entry<K, V> unmarshall(File file);
+    Map.Entry<K, V> convertFromXml(File file);
 
-    void marshal(K key, V value, File file);
+    void convertIntoXml(K key, V value, File file);
 
 }

@@ -1,18 +1,17 @@
 package by.pintusov.myCache.strategy;
 
-import cache.api.Cache;
+import by.pintusov.myCache.api.ICache;
 
 /**
  * Strategy for creating cache
- * 
  * @author pintusov
  */
 public interface CacheHolder<K, V> {
 
     /**
-     * @return Cache to use
+     * @return ICache to use
      */
-    Cache<K, V> getCache();
+    ICache<K, V> getCache();
 
     /**
      * If the cache is leveled, redistributes values between levels

@@ -1,34 +1,33 @@
 package by.pintusov.myCache;
 
-import cache.api.Cache;
-import cache.api.DoesNotExistException;
-import cache.strategy.CacheHolder;
-import cache.strategy.CacheStrategies;
+import by.pintusov.myCache.api.ICache;
+import by.pintusov.myCache.api.ObjectNotFoundException;
+import by.pintusov.myCache.strategy.CacheHolder;
+import by.pintusov.myCache.strategy.CacheStrategies;
 
 public class Main {
 
     /**
      * @param args
-     * @throws DoesNotExistException
+     * @throws ObjectNotFoundException
      */
-    public static void main(String[] args) throws DoesNotExistException {
+    public static void main(String[] args) throws ObjectNotFoundException {
 
         CacheStrategies<String, String> strategies = new CacheStrategies<String, String>();
         CacheHolder<String, String> cacheHolder = strategies.TWO_LEVELS_MEMORY_HARDDISK;
 
-        Cache<String, String> cache = cacheHolder.getCache();
-
-        cache.cache("key1", "value1");
-        cache.cache("key2", "value2");
-        cache.cache("key3", "value3");
-        cache.cache("key4", "value4");
-
-        cache.retrieve("key1");
-        cache.retrieve("key4");
-
+        ICache<String, String> cache = cacheHolder.getCache();
+        System.out.println(cache);
+        cache.put("key1", "value1");
+        cache.put("key2", "value2");
+        cache.put("key3", "value3");
+        cache.put("key4", "value4");
+        System.out.println(cache);
+        cache.extract("key1");
+        cache.extract("key4");
+        System.out.println(cache);
         // now values by key1 and key4 becomes the most used elements
-
-        cacheHolder.recache();
+        //cacheHolder.recache();
 
         // now only the most used values are stored in memory,
         // the rest are stored on the hard disk

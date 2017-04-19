@@ -1,123 +1,97 @@
 package by.pintusov.myCache.caching.disk;
 
+import by.pintusov.myCache.api.ICache;
+import by.pintusov.myCache.api.ObjectNotFoundException;
+import by.pintusov.myCache.caching.disk.strategy.MarshallerUnmarshaller;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import cache.api.Cache;
-import cache.api.DoesNotExistException;
-import cache.caching.disk.strategy.MarshallerUnmarshaller;
-
-public class FileSerializationCache<K extends Serializable, V extends Serializable> implements Cache<K, V> {
-
+public class FileSerializationCache<K extends Serializable, V extends Serializable> implements ICache<K, V> {
     private String DIR = "cache/";
-
-    private int elementsAdded;
-
+    private int elements;
     private MarshallerUnmarshaller<K, V> marshallerUnmarshaller;
-
-    /**
-     * Default constructor. If used, marshallerUnmarshaller has to be set manually via
-     * {@link FileSerializationCache#setMarshallerUnmarshaller(MarshallerUnmarshaller)}.
-     */
-    public FileSerializationCache() {
-    }
 
     public FileSerializationCache(MarshallerUnmarshaller<K, V> marshallerUnmarshaller) {
         this.marshallerUnmarshaller = marshallerUnmarshaller;
     }
 
+    public FileSerializationCache() {
+
+    }
+
     /**
      * Looks up the value in the given directory
-     * 
      * @param dir
-     * @param value
+     * @param key
      * @return File with value or null if none found
      */
     private File lookThroughDir(File dir, K key) {
         File[] files = dir.listFiles();
         for (File f : files) {
-            Entry<K, V> entry = marshallerUnmarshaller.unmarshall(f);
-
+            Entry<K, V> entry = marshallerUnmarshaller.convertFromXml(f);
             if (entry.getKey().equals(key)) {
                 return f;
             }
         }
-
         return null;
     }
 
-    @Override
-    public void cache(K key, V value) {
-        String hash = String.valueOf(key.hashCode());
-
-        String dirName = getDIR() + hash + "/";
-        File dir = new File(dirName);
-
-        File toUse = null;
-
+    public void put(K key, V value) {
+        String keyHashCode = String.valueOf(key.hashCode());
+        String dirName = getDIR() + keyHashCode + "/";
+        File dir = new File (dirName);
+        File inUse = null;
         if (!dir.exists()) {
-
-            dir.mkdirs();
-            toUse = new File(dirName + randomString());
-            elementsAdded++;
-
+            dir.mkdir();
+            inUse = new File (dirName + randomString());
+            elements++;
         } else {
-
-            toUse = lookThroughDir(dir, key);
-
-            if (toUse == null) {
-                toUse = new File(dirName + randomString());
-                elementsAdded++;
+            inUse = lookThroughDir(dir, key);
+            if (inUse == null) {
+                inUse = new File(dirName + randomString());
+                elements++;
             }
-
         }
-
-        marshallerUnmarshaller.marshal(key, value, toUse);
+        marshallerUnmarshaller.convertIntoXml(key, value, inUse);
     }
 
-    private String randomString() {
-        return UUID.randomUUID().toString();
-    }
-
-    @Override
-    public V retrieve(K key) throws DoesNotExistException {
-        String hash = String.valueOf(key.hashCode());
-
-        String dirName = getDIR() + hash + "/";
-        File dir = new File(dirName);
-
+    public V extract(K key) throws ObjectNotFoundException {
+        String keyHashCode = String.valueOf(key.hashCode());
+        String dirName = getDIR() + keyHashCode + "/";
+        File dir = new File (dirName);
         if (!dir.exists()) {
-            throw new DoesNotExistException();
+            throw new ObjectNotFoundException();
         }
-
-        File toUse = lookThroughDir(dir, key);
-
-        if (toUse == null) {
-            throw new DoesNotExistException();
+        File inUse = lookThroughDir(dir, key);
+        if (inUse == null) {
+            throw new ObjectNotFoundException();
         }
-
-        V result = marshallerUnmarshaller.unmarshall(toUse).getValue();
-
+        V result = marshallerUnmarshaller.convertFromXml(inUse).getValue();
         return result;
     }
 
-    @Override
     public void remove(K key) {
-        String hash = String.valueOf(key.hashCode());
-
-        String dirName = getDIR() + hash + "/";
+        String keyHashCode = String.valueOf(key.hashCode());
+        String dirName = getDIR() + keyHashCode + "/";
         File dir = new File(dirName);
-
         if (dir.exists()) {
             File toUse = lookThroughDir(dir, key);
-
             if (toUse != null) {
                 toUse.delete();
-                elementsAdded--;
+                elements--;
             }
         }
+    }
+
+    public void clear() {
+        recurseDelete(new File(getDIR()));
+    }
+
+    public int size() {
+        return elements;
     }
 
     public void setMarshallerUnmarshaller(MarshallerUnmarshaller<K, V> marshallerUnmarshaller) {
@@ -136,14 +110,12 @@ public class FileSerializationCache<K extends Serializable, V extends Serializab
         return DIR;
     }
 
-    @Override
-    public void clear() {
-        recurseDelete(new File(getDIR()));
+    private String randomString() {
+        return UUID.randomUUID().toString();
     }
 
     /**
      * Recursive deletes all the files
-     * 
      * @param file
      */
     private void recurseDelete(File file) {
@@ -158,8 +130,11 @@ public class FileSerializationCache<K extends Serializable, V extends Serializab
     }
 
     @Override
-    public int size() {
-        return elementsAdded;
+    public String toString() {
+        return "FileSerializationCache{" +
+                "DIR='" + DIR + '\'' +
+                ", elements=" + elements +
+                ", marshallerUnmarshaller=" + marshallerUnmarshaller +
+                '}';
     }
-
 }

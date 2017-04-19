@@ -1,86 +1,75 @@
 package by.pintusov.myCache.common;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import by.pintusov.myCache.api.ObjectNotFoundException;
 
-import cache.api.DoesNotExistException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Counter that hold the frequency of its called elements. Implementation of {@link CallFrequencyCounter}
- * 
  * @author pintusov
  */
 public class CallFrequencyCounterImpl<K> implements CallFrequencyCounter<K> {
+    private Map<K, Integer> frequency = new HashMap<K, Integer>();
 
-    private Map<K, Integer> frequencyMap = new HashMap<K, Integer>();
-
-    @Override
     public void register(K key) {
-        frequencyMap.put(key, Integer.valueOf(0));
+        frequency.put(key, Integer.valueOf(0));
     }
 
-    @Override
-    public void call(K key) throws DoesNotExistException {
-        if (frequencyMap.containsKey(key)) {
-            Integer frequency = frequencyMap.get(key);
+    public void call(K key) throws ObjectNotFoundException {
+        if (frequency.containsKey(key)) {
+            Integer frequency = this.frequency.get(key);
             frequency++;
-            frequencyMap.put(key, frequency);
+            this.frequency.put(key, frequency);
         } else {
-            throw new DoesNotExistException();
+            throw new ObjectNotFoundException();
         }
     }
 
-    @Override
-    public int getFrequency(K key) throws DoesNotExistException {
-        if (frequencyMap.containsKey(key)) {
-            return frequencyMap.get(key);
+    public int getFrequency(K key) throws ObjectNotFoundException {
+        if (frequency.containsKey(key)) {
+            return frequency.get(key);
         } else {
-            throw new DoesNotExistException();
+            throw new ObjectNotFoundException();
         }
     }
 
-    @Override
+    /*
+	* Creating a list of all entries in the map. Then sort it by the integer value;
+	* return only {amount} of them
+	*/
     public List<K> getMostFrequent(int amount) {
-        /*
-         * First of all, creating a list of all entries in the map. Then sort it by the integer value, not by the key;
-         * and then return only {amount} of them
-         */
-        List<Entry<K, Integer>> freqs = new ArrayList<Entry<K, Integer>>(frequencyMap.entrySet());
 
-        Collections.sort(freqs, new Comparator<Entry<K, Integer>>() {
-            @Override
+        List<Entry<K, Integer>> frequencies = new ArrayList<Entry<K, Integer>>(frequency.entrySet());
+        Collections.sort(frequencies, new Comparator<Entry<K, Integer>>() {
             public int compare(Entry<K, Integer> o1, Entry<K, Integer> o2) {
                 return -o1.getValue().compareTo(o2.getValue());
             }
         });
 
         List<K> result = new ArrayList<K>();
-
         for (int i = 0; i < amount; ++i) {
-            result.add(freqs.get(i).getKey());
+            result.add(frequencies.get(i).getKey());
         }
-
         return result;
     }
 
-    @Override
     public List<K> getMostFrequent() {
-        return getMostFrequent(frequencyMap.size());
+        return getMostFrequent(frequency.size());
     }
 
-    @Override
     public void reset() {
-        frequencyMap.clear();
+        frequency.clear();
+    }
+
+    public void removeElement(K key) {
+        frequency.remove(key);
     }
 
     @Override
-    public void removeElement(K key) {
-        frequencyMap.remove(key);
+    public String toString() {
+        return "CallFrequencyCounterImpl{" +
+                "frequency=" + frequency +
+                '}';
     }
-
 }

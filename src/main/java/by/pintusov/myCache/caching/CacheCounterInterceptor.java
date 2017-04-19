@@ -1,47 +1,44 @@
 package by.pintusov.myCache.caching;
 
 
-import by.pintusov.myCache.api.Cache;
+import by.pintusov.myCache.api.ICache;
+import by.pintusov.myCache.api.ObjectNotFoundException;
+import by.pintusov.myCache.common.CallFrequencyCounter;
+import by.pintusov.myCache.common.CallFrequencyCounterImpl;
 
 /**
- * Decorator for {@link Cache} which provides countering the reqiests to the cache.
- * 
+ * Decorator for {@link ICache} which provides countering the requests to the cache.
  * @author pintusov
- * 
- * @param <K> key
- * @param <V> value
  */
-public class CacheCounterInterceptor<K, V> implements Cache<K, V> {
-
-    final private Cache<K, V> innerCache;
+public class CacheCounterInterceptor<K, V> implements ICache<K, V> {
+    final private ICache<K, V> innerICache;
     private CallFrequencyCounter<K> callFrequencyCounter = new CallFrequencyCounterImpl<K>();
 
-    public CacheCounterInterceptor(Cache<K, V> innerCache) {
-        this.innerCache = innerCache;
+    public CacheCounterInterceptor(ICache<K, V> innerICache) {
+        this.innerICache = innerICache;
     }
 
-    @Override
-    public void cache(K key, V value) {
+    public void put(K key, V value) {
         getCallFrequencyCounter().register(key);
-        innerCache.cache(key, value);
+        innerICache.put(key, value);
     }
 
-    @Override
-    public V retrieve(K key) throws DoesNotExistException {
-        // logging how often we retrieve an object
+    public V extract(K key) throws ObjectNotFoundException {
         getCallFrequencyCounter().call(key);
-        return innerCache.retrieve(key);
+        return innerICache.extract(key);
     }
 
-    @Override
     public void clear() {
-        innerCache.clear();
+        innerICache.clear();
         getCallFrequencyCounter().reset();
     }
 
-    @Override
     public void remove(K key) {
-        innerCache.remove(key);
+        innerICache.remove(key);
+    }
+
+    public int size() {
+        return innerICache.size();
     }
 
     public void setCallFrequencyCounter(CallFrequencyCounter<K> callFrequencyCounter) {
@@ -53,8 +50,10 @@ public class CacheCounterInterceptor<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public int size() {
-        return innerCache.size();
+    public String toString() {
+        return "CacheCounterInterceptor{" +
+                "innerICache=" + innerICache +
+                ", callFrequencyCounter=" + callFrequencyCounter +
+                '}';
     }
-
 }

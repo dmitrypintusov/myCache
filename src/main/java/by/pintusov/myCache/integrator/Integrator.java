@@ -1,12 +1,12 @@
 package by.pintusov.myCache.integrator;
 
-import by.pintusov.myCache.api.Cache;
+import by.pintusov.myCache.api.ICache;
 import by.pintusov.myCache.api.ObjectNotFoundException;
 
 import java.util.List;
 
-public class Integrator<K, V> implements Cache<K, V> {
-    private List<Cache<K, V>> caches;
+public class Integrator<K, V> implements ICache<K, V> {
+    private List<ICache<K, V>> caches;
 
     /*
     * Put parameters to first level cache
@@ -17,9 +17,9 @@ public class Integrator<K, V> implements Cache<K, V> {
 
     public V extract(K key) throws ObjectNotFoundException {
         V value = null;
-        for (Cache <K, V> cache : caches) {
+        for (ICache<K, V> ICache : caches) {
             try {
-                value = cache.extract(key);
+                value = ICache.extract(key);
                 return value;
             } catch (ObjectNotFoundException e) {
                 System.out.println(e);
@@ -29,31 +29,37 @@ public class Integrator<K, V> implements Cache<K, V> {
     }
 
     public void remove(K key) {
-        for (Cache<K, V> cache : caches) {
-            cache.remove(key);
+        for (ICache<K, V> ICache : caches) {
+            ICache.remove(key);
         }
     }
 
     public void clear() {
-        for (Cache <K, V> cache : caches) {
-            cache.clear();
+        for (ICache<K, V> ICache : caches) {
+            ICache.clear();
         }
     }
 
     public int size() {
         int size = 0;
-        for (Cache <K, V> cache : caches) {
-            size = size + cache.size();
+        for (ICache<K, V> ICache : caches) {
+            size = size + ICache.size();
         }
         return size;
     }
 
-
-    public void setCaches(List<Cache<K, V>> caches) {
+    public void setCaches(List<ICache<K, V>> caches) {
         this.caches = caches;
     }
 
-    public List<Cache<K, V>> getCaches() {
+    public List<ICache<K, V>> getCaches() {
         return caches;
+    }
+
+    @Override
+    public String toString() {
+        return "Integrator{" +
+                "caches=" + caches +
+                '}';
     }
 }

@@ -1,17 +1,17 @@
 package by.pintusov.myCache.builder;
 
-import by.pintusov.myCache.api.Cache;
+import by.pintusov.myCache.api.ICache;
 
 /**
  * Leveled cache - objects which can have multiple levels of caching
  * @author pintusov
  */
-public interface LeveledCache<K, V> {
+public interface ILeveledCache<K, V> {
 
     /**
-     * @return Returns all levels of cache wrapped in one {@link Cache} instance.
+     * @return Returns all levels of cache wrapped in one {@link ICache} instance.
      */
-    Cache<K, V> asCache();
+    ICache<K, V> allCache();
 
     /**
      * Redistributes cached objects within levels. Strategy of redistributing depends on implementation.

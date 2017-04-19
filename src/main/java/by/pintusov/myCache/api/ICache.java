@@ -5,7 +5,7 @@ package by.pintusov.myCache.api;
  * My cache interface
  * @author pintusov
  */
-public interface Cache <K, V> {
+public interface ICache<K, V> {
     /**
      * Puts values to cache
      * @param key

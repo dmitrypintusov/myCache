@@ -1,17 +1,16 @@
 package by.pintusov.myCache.strategy;
 
-import java.io.Serializable;
+import by.pintusov.myCache.api.ICache;
+import by.pintusov.myCache.builder.MultipleLevelCache;
+import by.pintusov.myCache.builder.OneLevelCache;
+import by.pintusov.myCache.caching.disk.FileSerializationCache;
+import by.pintusov.myCache.caching.disk.strategy.StandartMarshallerUnmarshaller;
+import by.pintusov.myCache.caching.memory.MemoryCache;
 
-import cache.api.Cache;
-import cache.builder.MultipleLevelCache;
-import cache.builder.OneLevelCache;
-import cache.caching.disk.FileSerializationCache;
-import cache.caching.disk.strategy.StandartMarshallerUnmarshaller;
-import cache.caching.memory.MemoryCache;
+import java.io.Serializable;
 
 /**
  * Implementations of CacheHolder interfaces
- * 
  * @author pintusov
  */
 public class CacheStrategies<K extends Serializable, V extends Serializable> {
@@ -24,12 +23,10 @@ public class CacheStrategies<K extends Serializable, V extends Serializable> {
             this.cacheHolder = new OneLevelCache<K, V>(new MemoryCache<K, V>());
         }
 
-        @Override
-        public Cache<K, V> getCache() {
-            return cacheHolder.asCache();
+        public ICache<K, V> getCache() {
+            return cacheHolder.allCache();
         }
 
-        @Override
         public void recache() {
             this.cacheHolder.recache();
         }
@@ -37,19 +34,14 @@ public class CacheStrategies<K extends Serializable, V extends Serializable> {
 
     public final CacheHolder<K, V> ONE_LEVEL_HARDDISK = new CacheHolder<K, V>() {
         private OneLevelCache<K, V> cacheHolder;
-
         {
             FileSerializationCache<K, V> cache = new FileSerializationCache<K, V>();
             cache.setMarshallerUnmarshaller(new StandartMarshallerUnmarshaller<K, V>());
             this.cacheHolder = new OneLevelCache<K, V>(cache);
         }
-
-        @Override
-        public Cache<K, V> getCache() {
-            return cacheHolder.asCache();
+        public ICache<K, V> getCache() {
+            return cacheHolder.allCache();
         }
-
-        @Override
         public void recache() {
             this.cacheHolder.recache();
         }
@@ -57,19 +49,16 @@ public class CacheStrategies<K extends Serializable, V extends Serializable> {
 
     public final CacheHolder<K, V> TWO_LEVELS_MEMORY_HARDDISK = new CacheHolder<K, V>() {
         private MultipleLevelCache<K, V> cacheHolder;
-
         {
             // using default constructor of MultipleLevelCache which provides
             // needed two levels caching
             this.cacheHolder = new MultipleLevelCache<K, V>();
         }
 
-        @Override
-        public Cache<K, V> getCache() {
-            return cacheHolder.asCache();
+        public ICache<K, V> getCache() {
+            return cacheHolder.allCache();
         }
 
-        @Override
         public void recache() {
             this.cacheHolder.recache();
         }
