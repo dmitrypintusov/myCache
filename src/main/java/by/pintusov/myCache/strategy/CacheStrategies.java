@@ -42,6 +42,7 @@ public class CacheStrategies<K extends Serializable, V extends Serializable> {
         public ICache<K, V> getCache() {
             return cacheHolder.allCache();
         }
+
         public void recache() {
             this.cacheHolder.recache();
         }
