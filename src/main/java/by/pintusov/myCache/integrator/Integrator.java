@@ -55,11 +55,4 @@ public class Integrator<K, V> implements ICache<K, V> {
     public List<ICache<K, V>> getCaches() {
         return caches;
     }
-
-    @Override
-    public String toString() {
-        return "Integrator{" +
-                "caches=" + caches +
-                '}';
-    }
 }

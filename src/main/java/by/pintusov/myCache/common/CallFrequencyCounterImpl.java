@@ -65,11 +65,4 @@ public class CallFrequencyCounterImpl<K> implements CallFrequencyCounter<K> {
     public void removeElement(K key) {
         frequency.remove(key);
     }
-
-    @Override
-    public String toString() {
-        return "CallFrequencyCounterImpl{" +
-                "frequency=" + frequency +
-                '}';
-    }
 }

@@ -48,12 +48,4 @@ public class CacheCounterInterceptor<K, V> implements ICache<K, V> {
     public CallFrequencyCounter<K> getCallFrequencyCounter() {
         return callFrequencyCounter;
     }
-
-    @Override
-    public String toString() {
-        return "CacheCounterInterceptor{" +
-                "innerICache=" + innerICache +
-                ", callFrequencyCounter=" + callFrequencyCounter +
-                '}';
-    }
 }

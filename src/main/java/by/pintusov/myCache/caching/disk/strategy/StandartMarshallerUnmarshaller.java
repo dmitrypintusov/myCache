@@ -88,9 +88,4 @@ public class StandartMarshallerUnmarshaller<K extends Serializable, V extends Se
             throw new RuntimeException("Operation is not supported");
         }
     }
-
-    @Override
-    public String toString() {
-        return "StandartMarshallerUnmarshaller{}";
-    }
 }

@@ -128,13 +128,4 @@ public class FileSerializationCache<K extends Serializable, V extends Serializab
             }
         }
     }
-
-    @Override
-    public String toString() {
-        return "FileSerializationCache{" +
-                "DIR='" + DIR + '\'' +
-                ", elements=" + elements +
-                ", marshallerUnmarshaller=" + marshallerUnmarshaller +
-                '}';
-    }
 }

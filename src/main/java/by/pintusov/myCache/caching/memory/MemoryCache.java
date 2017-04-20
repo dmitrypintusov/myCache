@@ -31,11 +31,4 @@ public class MemoryCache<K, V> implements ICache<K, V> {
     public int size() {
         return memoryMap.size();
     }
-
-    @Override
-    public String toString() {
-        return "MemoryCache{" +
-                "memoryMap=" + memoryMap +
-                '}';
-    }
 }
